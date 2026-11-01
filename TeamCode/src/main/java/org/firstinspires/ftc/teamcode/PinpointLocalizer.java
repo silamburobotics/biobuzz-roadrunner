@@ -18,8 +18,8 @@ import java.util.Objects;
 public final class PinpointLocalizer implements Localizer {
     public static class Params {
         // pod offsets in ticks: par pod Y offset and perp pod X offset from the robot center
-        public double parYTicks = 0.0;
-        public double perpXTicks = 0.0;
+        public double parYTicks = 2227.3110649826767;
+        public double perpXTicks = -2296.861447945467;
     }
 
     public static Params PARAMS = new Params();
