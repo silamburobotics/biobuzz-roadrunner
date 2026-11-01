@@ -65,8 +65,8 @@ MecanumDrive {
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
 
         // drive model parameters
-        // goBILDA 4-bar pod: ~19.89 ticks/mm -> inches per tick
-        public double inPerTick = 1 / (19.89 * 25.4);
+        // tuned with ForwardPushTest / LateralPushTest (100 in pushes)
+        public double inPerTick = 0.00293;
         public double lateralInPerTick = inPerTick;
         public double trackWidthTicks = 0;
 
