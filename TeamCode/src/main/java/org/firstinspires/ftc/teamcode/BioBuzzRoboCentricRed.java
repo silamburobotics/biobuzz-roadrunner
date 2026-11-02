@@ -38,7 +38,7 @@ public class BioBuzzRoboCentricRed extends LinearOpMode {
     public static double RIGHT_SERVO_TRIM_OFFSET = 0.0;   // Optional fine trim offset for right servo
 
     // --- Axon Gate & Shifter Servo Configuration (Gamepad 2) ---
-    public static double OPEN_POSITION = 0.5;           // Gate Open position
+    public static double OPEN_POSITION = 0.4;          // Gate Open position
     public static double CLOSED_POSITION = 0.7;        // Gate Closed position
     public static String GATE_SERVO = "gateServo";
 
@@ -56,8 +56,8 @@ public class BioBuzzRoboCentricRed extends LinearOpMode {
     public static boolean TURRET_REVERSED = false;         // Set true if turret rotates opposite
 
     // --- GoBILDA 6000 RPM Flywheel Motors Configuration (Gamepad 2) ---
-    public static double FLYWHEEL_OPEN_RPM = 2400.0;     // Target RPM when shifter is OPEN (0.25)
-    public static double FLYWHEEL_CLOSED_RPM = 2400.0;   // Target RPM when shifter is CLOSED (0.95)
+    public static double FLYWHEEL_OPEN_RPM = 2450.0;     // Target RPM when shifter is OPEN (0.25)
+    public static double FLYWHEEL_CLOSED_RPM = 2450.0;   // Target RPM when shifter is CLOSED (0.95)
     public static double TICKS_PER_REV = 28.0;          // GoBILDA 6000 RPM motor encoder resolution (28 PPR)
     public static boolean MOTOR_2_REVERSED = true;      // Set true if motor 2 spins opposite to motor 1
     public static boolean FLYWHEEL_ENABLED = false;     // Toggle flywheel motors ON/OFF

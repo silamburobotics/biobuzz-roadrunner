@@ -30,9 +30,9 @@ public class LimelightShooterSubsystem {
     public static double TURRET_MAX_ANGLE_DEG = 90.0;
 
     // Ball Type Flywheel RPM Curves (Pollen = Smaller Ball, Nectar = Bigger Ball)
-    public static double POLLEN_BASE_RPM = 2400.0;         // Base RPM for Pollen (Smaller ball)
+    public static double POLLEN_BASE_RPM = 2450.0;         // Base RPM for Pollen (Smaller ball)
     public static double POLLEN_RPM_SLOPE = 12.0;          // RPM increase per inch of distance
-    public static double NECTAR_BASE_RPM = 2400.0;         // Base RPM for Nectar (Bigger ball)
+    public static double NECTAR_BASE_RPM = 2450.0;         // Base RPM for Nectar (Bigger ball)
     public static double NECTAR_RPM_SLOPE = 15.0;          // RPM increase per inch of distance
 
     public static double FLYWHEEL_MIN_RPM = 2000.0;
