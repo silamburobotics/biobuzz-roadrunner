@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -23,9 +24,15 @@ import com.qualcomm.robotcore.util.Range;
 @Autonomous(name = "BB-Auto-Red-First", group = "Auto")
 public class BBAutoRedFirst extends LinearOpMode {
 
-    public static double SPINUP_WAIT_SEC = 3.0;   // flywheel on, gate closed
+    public static double FLYWHEEL_RPM = 2800.0;   // auto shooter speed (teleop stays separate)
+    public static double SPINUP_WAIT_SEC = 3.0;  // flywheel on, gate closed
     public static double GATE_OPEN_SEC = 3.0;     // gate open, shooting
-    public static double DRIVE_DISTANCE_IN = 20.0; // forward move after shooting
+    public static double DRIVE_DISTANCE_IN = 40.0; // forward move after shooting, then back the same distance
+    public static double WAIT_AFTER_DRIVE_SEC = 3.0; // pause at the far point before driving back
+    public static double WAIT_AFTER_GATE_OPEN_SEC = 3.0; // pause with the gate open back at the start line
+    public static double STRAFE_RIGHT_IN = 40.0;  // sideways move to the right at the end
+    public static double TURN_CLOCKWISE_DEG = 90.0; // clockwise turn after the strafe
+    public static double MOVE_AFTER_TURN_IN = 40.0; // forward move (robot's front) after the turn
 
     private DcMotorEx shooter1;
     private DcMotorEx shooter2;
@@ -63,7 +70,7 @@ public class BBAutoRedFirst extends LinearOpMode {
         waitForStart();
         if (isStopRequested()) return;
 
-        double flywheelRPM = BioBuzzRoboCentricRed.FLYWHEEL_CLOSED_RPM;
+        double flywheelRPM = FLYWHEEL_RPM;
 
         // Gate is closed. Start intake and flywheel, wait.
         intake.setPower(BioBuzzRoboCentricRed.INTAKE_POWER);
@@ -87,13 +94,75 @@ public class BBAutoRedFirst extends LinearOpMode {
                             .build());
         }
 
-        // Stop everything.
-        intake.setPower(0.0);
+        // Wait, then drive back to the start line. The intake keeps running.
+        ElapsedTime waitTimer = new ElapsedTime();
+        while (opModeIsActive() && waitTimer.seconds() < WAIT_AFTER_DRIVE_SEC) {
+            telemetry.addData("Step", "Waiting at far point");
+            telemetry.update();
+            sleep(20);
+        }
+
+        if (opModeIsActive()) {
+            Actions.runBlocking(
+                    drive.actionBuilder(drive.localizer.getPose())
+                            .lineToX(0)
+                            .build());
+        }
+
+        // Back at the start line: open the gate.
+        if (opModeIsActive()) {
+            gate.setPosition(BioBuzzRoboCentricRed.OPEN_POSITION);
+        }
+
+        // Wait with the gate open.
+        ElapsedTime gateTimer = new ElapsedTime();
+        while (opModeIsActive() && gateTimer.seconds() < WAIT_AFTER_GATE_OPEN_SEC) {
+            telemetry.addData("Step", "Gate open at start line");
+            telemetry.update();
+            sleep(20);
+        }
+
+        // Strafe right. In Road Runner +Y is left, so right is -Y.
+        if (opModeIsActive()) {
+            Pose2d here = drive.localizer.getPose();
+            Actions.runBlocking(
+                    drive.actionBuilder(here)
+                            .strafeTo(new Vector2d(here.position.x, here.position.y - STRAFE_RIGHT_IN))
+                            .build());
+        }
+
+        // Turn clockwise. In Road Runner counterclockwise is positive, so clockwise is negative.
+        if (opModeIsActive()) {
+            Actions.runBlocking(
+                    drive.actionBuilder(drive.localizer.getPose())
+                            .turn(-Math.toRadians(TURN_CLOCKWISE_DEG))
+                            .build());
+        }
+
+        // Move forward along the robot's current heading (after the turn this is not field +X).
+        if (opModeIsActive()) {
+            Pose2d here = drive.localizer.getPose();
+            double heading = here.heading.toDouble();
+            Actions.runBlocking(
+                    drive.actionBuilder(here)
+                            .strafeTo(new Vector2d(
+                                    here.position.x + MOVE_AFTER_TURN_IN * Math.cos(heading),
+                                    here.position.y + MOVE_AFTER_TURN_IN * Math.sin(heading)))
+                            .build());
+        }
+
+        // Stop the flywheels. The intake is left running.
         shooter1.setPower(0.0);
         shooter2.setPower(0.0);
 
-        telemetry.addData("Status", "Done");
+        telemetry.addData("Status", "Done - intake running");
         telemetry.update();
+
+        // Returning from runOpMode ends the OpMode and the SDK powers every motor off,
+        // so stay here to keep the intake running until the auto period ends.
+        while (opModeIsActive()) {
+            sleep(20);
+        }
     }
 
     /** Runs the flywheel at targetRPM for the given time, using the same control as teleop. */
